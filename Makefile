@@ -5,4 +5,4 @@ clean:
 	rm -f test.png
 
 build:
-	gcc trace.c -o trace -lOpenCL -lpng
+	clang trace.c -o trace -lOpenCL -lpng -DCL_TARGET_OPENCL_VERSION=120

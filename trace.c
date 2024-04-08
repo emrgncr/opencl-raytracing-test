@@ -281,10 +281,7 @@ int main() {
       CL_RUN(clCreateBuffer, context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
              sizeof(_color_buffer), _color_buffer);
 
-  cl_queue_properties _properties[] = {CL_QUEUE_PROPERTIES,
-                                       CL_QUEUE_PROFILING_ENABLE, 0};
-  cl_command_queue queue =
-      CL_RUN(clCreateCommandQueueWithProperties, context, device, _properties);
+  cl_command_queue queue = CL_RUN(clCreateCommandQueue, context, device, 0);
 
   cl_kernel kernel = CL_RUN(clCreateKernel, program, "trace");
 
@@ -324,16 +321,15 @@ float4 *Ribuffer,
   CL_RUN2(clSetKernelArg(kernel, 12, sizeof(int), &ysize));
   CL_RUN2(clSetKernelArg(kernel, 13, sizeof(float), &focal_len));
 
-  printf("adad\n");
   CL_RUN2(clEnqueueNDRangeKernel(queue, kernel, 3, NULL, global_size,
                                  local_size, 0, NULL, NULL));
-  printf("adad\n");
   CL_RUN2(clEnqueueReadBuffer(queue, out_buffer, CL_TRUE, 0,
                               OUT_BUFFER_LEN * sizeof(float4), out, 0, NULL,
                               NULL));
 
-  printf("Done with evtr\n");
+  printf("Done with kernels\n");
 
+#ifdef PRINT_OUTPUT
   int sum = 0;
 
   for (int i = 0; i < NUM_PIXELS_Y; i++) {
@@ -352,6 +348,7 @@ float4 *Ribuffer,
   printf("%.2f ", out[((0 * NUM_PIXELS_X) + 2) * 4]);
 
   printf("%.2f\n", out[((250 * NUM_PIXELS_X) + 250) * 4]);
+#endif
 
   // convert out to unsigned char
   uchar *outc = calloc(OUT_BUFFER_LEN * 4, sizeof(uchar));
